@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Groundwork | CSE273 Foundations of Machine Learning Project Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    :root { --ink: #11110f; --muted: #57534b; --faint: #8e897e; --line: #11110f1f; --accent: #2a7f62; --paper: #f5f2ea; --code: #1b1b19; --green: #2f7a46; }
+    @page { size: A4; margin: 15mm 14mm 16mm; }
+    @page :first { margin: 0; }
+    * { box-sizing: border-box; }
+    html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { margin: 0; color: var(--ink); font: 9.6pt/1.55 'Inter', -apple-system, 'Segoe UI', sans-serif; }
+    h1, h2, h3, h4 { letter-spacing: -0.02em; line-height: 1.2; break-after: avoid; }
+    h2 { margin: 0 0 12px; font-size: 20pt; font-weight: 800; letter-spacing: -0.035em; }
+    h3 { margin: 20px 0 6px; font-size: 12pt; font-weight: 700; }
+    h4 { margin: 14px 0 4px; font-size: 10pt; font-weight: 700; }
+    p { margin: 0 0 8px; }
+    a { color: var(--ink); }
+    ul, ol { margin: 4px 0 10px; padding-left: 18px; }
+    li { margin-bottom: 3px; }
+    code { padding: 0.5px 4px; background: #11110f0f; border-radius: 3px; font: 8pt 'JetBrains Mono', ui-monospace, monospace; }
+    b, strong { font-weight: 650; }
+
+    .chapter { break-before: page; }
+    .kicker { margin: 0 0 6px; color: var(--accent); font: 600 7.5pt/1 'JetBrains Mono', monospace; letter-spacing: 0.16em; text-transform: uppercase; }
+    .lead { max-width: 160mm; margin-bottom: 14px; color: var(--muted); font-size: 10.6pt; line-height: 1.55; }
+
+    table { width: 100%; margin: 8px 0 14px; border-collapse: collapse; font-size: 8.5pt; }
+    th, td { padding: 5.5px 7px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    thead th { color: var(--muted); font: 600 7pt/1.3 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; border-bottom: 1.5px solid var(--ink); }
+    tbody th { font-weight: 650; }
+    tr { break-inside: avoid; }
+    .t-topics tbody th { width: 27%; }
+    .t-topics td:last-child { width: 13%; color: var(--accent); font: 600 7.6pt 'JetBrains Mono', monospace; white-space: nowrap; }
+    .ok { color: var(--green); font-weight: 700; }
+
+    figure { margin: 6px 0 14px; break-inside: avoid; }
+    figure img { display: block; width: 100%; border: 1px solid var(--line); border-radius: 6px; }
+    figcaption { margin-top: 5px; color: var(--muted); font-size: 8pt; line-height: 1.45; }
+    figcaption b { color: var(--ink); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; align-items: start; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 10px; align-items: start; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 10px; align-items: start; }
+    .fig-phone { max-width: 70mm; }
+    .fig-phone img { max-height: 125mm; object-fit: cover; object-position: top; }
+    .fig-tall img { max-height: 150mm; object-fit: cover; object-position: top; }
+    .fig-short img { max-height: 95mm; object-fit: cover; object-position: top; }
+
+    pre { margin: 6px 0 12px; padding: 10px 12px; overflow: hidden; color: #ecebe6; background: var(--code); border-radius: 6px; font: 7.4pt/1.5 'JetBrains Mono', ui-monospace, monospace; white-space: pre-wrap; break-inside: avoid; }
+    pre .file { display: block; margin-bottom: 6px; color: #7dd3e6; font-weight: 600; }
+    .walk { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; align-items: start; break-inside: avoid; margin-bottom: 6px; }
+    .walk pre { margin-top: 0; }
+    .walk p, .walk li { font-size: 8.8pt; }
+    .tags { margin: 6px 0 0; }
+    .tag { display: inline-block; margin: 0 4px 4px 0; padding: 1.5px 7px; color: var(--accent); background: #2a7f6214; border-radius: 99px; font: 600 7pt 'JetBrains Mono', monospace; }
+
+    .note { margin: 8px 0 12px; padding: 9px 12px; background: var(--paper); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; font-size: 9pt; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0 16px; }
+    .stat { padding: 12px; background: var(--paper); border-radius: 8px; }
+    .stat b { display: block; font-size: 19pt; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; }
+    .stat span { color: var(--muted); font-size: 8pt; }
+    .co-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+    .co-card { padding: 10px 11px; background: var(--paper); border-radius: 8px; font-size: 8.4pt; break-inside: avoid; }
+    .co-card b { display: block; margin-bottom: 2px; color: var(--accent); font: 700 8.5pt 'JetBrains Mono', monospace; }
+    .co-card em { display: block; margin-top: 5px; color: var(--muted); font-style: normal; font-size: 7.8pt; }
+    .prac { padding: 12px 0 4px; border-top: 1.5px solid var(--ink); break-inside: avoid; }
+    .prac h4 { margin: 0 0 4px; }
+    .prac h4 span { color: var(--accent); font-family: 'JetBrains Mono', monospace; margin-right: 6px; }
+    .toc { columns: 2; column-gap: 14mm; margin-top: 10px; padding: 0; list-style: none; }
+    .toc li { display: flex; gap: 10px; margin-bottom: 9px; padding-bottom: 7px; border-bottom: 1px solid var(--line); break-inside: avoid; font-size: 10pt; font-weight: 600; }
+    .toc li span { color: var(--accent); font: 600 9pt 'JetBrains Mono', monospace; }
+    .toc li small { display: block; color: var(--muted); font-weight: 400; font-size: 8.2pt; }
+
+    /* cover */
+    .cover { position: relative; height: 297mm; padding: 18mm 16mm 16mm; overflow: hidden; color: #f2f0e9; background: #0d0d0c; break-after: page; }
+    .cover__top { display: flex; justify-content: space-between; color: #f2f0e999; font: 600 7.5pt/1 'JetBrains Mono', monospace; letter-spacing: 0.16em; text-transform: uppercase; }
+    .cover h1 { margin: 22mm 0 6mm; font-size: 62pt; font-weight: 800; letter-spacing: -0.06em; line-height: 0.9; }
+    .cover h1 span { color: var(--accent); }
+    .cover__sub { max-width: 140mm; margin: 0 0 10mm; color: #f2f0e9cc; font-size: 12.5pt; line-height: 1.5; }
+    .cover__shot { width: 100%; height: 92mm; object-fit: cover; object-position: top; border-radius: 8px; border: 1px solid #ffffff1f; }
+    .cover dl { position: absolute; left: 16mm; right: 16mm; bottom: 16mm; display: grid; grid-template-columns: 38mm 1fr 38mm 1fr; gap: 8px 10px; margin: 0; padding-top: 14px; border-top: 1px solid #f2f0e94d; font-size: 9pt; }
+    .cover dt { color: #f2f0e980; font: 600 7pt/1.8 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
+    .cover dd { margin: 0; }
+    .cover a { color: #f2f0e9; }
+    .blank { display: inline-block; min-width: 40mm; border-bottom: 1px solid #f2f0e980; }
+
+    .diagram { margin: 6px 0 14px; padding: 12px; background: var(--paper); border-radius: 8px; break-inside: avoid; }
+    .diagram svg { display: block; width: 100%; height: auto; }
+    .cover h1 span { color: #7fd1ae; }
+    .t-map tbody th { width: 46%; }
+    .t-map td.where { width: 22%; color: var(--accent); font: 600 7.6pt 'JetBrains Mono', monospace; }
+    .walk { grid-template-columns: 1fr; gap: 2px; break-inside: auto; margin-bottom: 10px; }
+    .walk pre { margin-bottom: 4px; font-size: 7pt; }
+    .walk > div { columns: 2; column-gap: 12px; }
+    pre, code { font-variant-ligatures: none; }
+    pre.term { color: #e6e9f2; background: #1d2b36; }
+    table.num td, table.num th { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+    <div class="cover__top"><span>CSE273 · Foundations of Machine Learning</span><span>Project report</span></div>
+    <h1>Ground<span>work</span></h1>
+    <p class="cover__sub">The foundations of machine learning, worked through on one real dataset. Six notebooks, one per unit, run on the 630,000-field Kaggle irrigation competition I entered. Every formula is checked against a library or a numerical answer, the optimisers are written from scratch, and the learning-theory bounds are tested by experiment.</p>
+    <img class="cover__shot" src="figures/site-home.png" alt="">
+    <dl>
+        <dt>Student</dt><dd>Lukshya Singh Supyal</dd>
+        <dt>Registration no.</dt><dd><span class="blank">&nbsp;</span></dd>
+        <dt>Programme</dt><dd>B.Tech CSE, Semester 5</dd>
+        <dt>Course</dt><dd>CSE273 Foundations of Machine Learning</dd>
+        <dt>Website</dt><dd><a href="https://lushadowx.github.io/Groundwork/">lushadowx.github.io/Groundwork</a></dd>
+        <dt>Source code</dt><dd><a href="https://github.com/LuShadowX/Groundwork">github.com/LuShadowX/Groundwork</a></dd>
+    </dl>
+</section>
+
+<section>
+    <p class="kicker">Contents</p>
+    <h2>What's in this report</h2>
+    <ol class="toc">
+        <li><span>01</span><div>Project overview<small>Idea, data, numbers</small></div></li>
+        <li><span>02</span><div>How it's built<small>Package, notebooks, site</small></div></li>
+        <li><span>03</span><div>Unit I<small>ML foundations and NumPy</small></div></li>
+        <li><span>04</span><div>Unit II<small>Pandas and Matplotlib</small></div></li>
+        <li><span>05</span><div>Unit III<small>Exploratory data analysis</small></div></li>
+        <li><span>06</span><div>Unit IV<small>Linear algebra, probability, calculus</small></div></li>
+        <li><span>07</span><div>Unit V<small>Statistics and optimisation</small></div></li>
+        <li><span>08</span><div>Unit VI<small>Statistical learning theory</small></div></li>
+        <li><span>09</span><div>Syllabus mapping<small>All 57 topics</small></div></li>
+        <li><span>10</span><div>Code walkthrough<small>The important functions</small></div></li>
+        <li><span>11</span><div>Testing<small>What was checked</small></div></li>
+        <li><span>12</span><div>Deployment and conclusion<small>Site, Kaggle, what I learned</small></div></li>
+    </ol>
+    <div class="note" style="margin-top:14px">Every figure and number in this report comes from executing the notebooks on the real data; the figures are the files the notebooks saved, and the numbers are copied from their outputs. Code extracts are copied from the source files with their file names and line numbers.</div>
+    <h3>Course and scope</h3>
+    <p>The project follows the CSE273 syllabus as published unit by unit on the university notes site: Machine Learning Foundation, Pandas for Data Handling, Exploratory Data Analysis, Linear Algebra and Calculus, Statistics for ML, and Statistical Learning Theory. Each unit has one notebook, and chapter 09 maps all 57 listed topics to the notebook section that covers them. The course page does not list numbered course outcomes, so the mapping is by topic.</p>
+    <h3>Why this dataset</h3>
+    <p>In April 2026 I entered Kaggle's Playground Series S6E4, <i>Predicting Irrigation Need</i>, with a quick model (one-hot features, XGBoost, plain argmax), which scored a balanced accuracy of 0.9602 and ranked 3,391 of 4,315. Using the same data for this course makes the foundations concrete: every abstract idea gets tested on something I had already tried to solve. (The applied side, improving that submission, is my CSE274 project, <i>Irrigate</i>.)</p>
+</section>
+
+<section class="chapter">
+    <p class="kicker">01 · Project overview</p>
+    <h2>Foundations, measured instead of quoted</h2>
+    <p class="lead">Foundations courses tend to state results: bias and variance trade off, gradients point uphill, a 95% interval covers the truth 95% of the time, the PAC bound guarantees generalisation. With 630,000 labelled examples, each of those can be measured. Treating the full dataset as the population makes the "true" answer known, so a theorem can be checked as well as stated.</p>
+    <div class="stats">
+        <div class="stat"><b>6</b><span>notebooks, one per syllabus unit</span></div>
+        <div class="stat"><b>57</b><span>syllabus topics mapped</span></div>
+        <div class="stat"><b>4</b><span>optimisers written from scratch</span></div>
+        <div class="stat"><b>16</b><span>unit tests, all passing</span></div>
+    </div>
+    <h3>The data</h3>
+    <table>
+        <thead><tr><th>Item</th><th>Value</th></tr></thead>
+        <tbody>
+            <tr><th>Source</th><td>Kaggle Playground Series S6E4, <i>Predicting Irrigation Need</i> (April 2026)</td></tr>
+            <tr><th>Rows</th><td>630,000 training fields (270,000 test fields without labels)</td></tr>
+            <tr><th>Features</th><td>11 numeric (soil pH, moisture, organic carbon, conductivity, temperature, humidity, rainfall, sunlight, wind, field area, previous irrigation) and 8 categorical (soil, crop, growth stage, season, irrigation type, water source, mulching, region)</td></tr>
+            <tr><th>Target</th><td>Irrigation need: Low 58.7%, Medium 37.9%, High 3.3%</td></tr>
+            <tr><th>Metric</th><td>Balanced accuracy (mean of the per-class recalls)</td></tr>
+        </tbody>
+    </table>
+    <h3>Highlights</h3>
+    <ul>
+        <li><b>Bias² and variance measured</b> by training 30 trees per depth on bootstrap samples: bias² falls from 0.22 to 0.02 while variance rises, and their sum is lowest at depth 6.</li>
+        <li><b>Gradient descent, Momentum, RMSProp and Adam written from scratch</b> (about 60 lines). On the irrigation data all four reach within 0.004 of scikit-learn's optimum once each has its own tuned learning rate. On the Rosenbrock valley, Adam and Momentum reach the minimum and plain GD does not.</li>
+        <li><b>Learning theory tested by experiment.</b> The PAC bound for 400 decision stumps held in 300 out of 300 samples. My own library <code>conviction</code> certified an error rate of at most 0.5%, and on unseen data the rate was 0.37%. The No Free Lunch theorem was checked exhaustively: every learner, including one built to be wrong, averages exactly 50% over all 256 possible targets.</li>
+    </ul>
+</section>
+
+<section class="chapter">
+    <p class="kicker">02 · How it's built</p>
+    <h2>A small package, six notebooks, one site</h2>
+    <p class="lead">The parts worth testing live in a Python package; the notebooks import it, explain each idea and run it on the data; a build script turns the executed notebooks into a website. The notebooks run unchanged on Kaggle (the first cell installs the package from GitHub).</p>
+    <div class="diagram">
+        <svg viewBox="0 0 760 220" font-family="Inter, sans-serif" font-size="11">
+            <rect x="10" y="10" width="740" height="40" rx="10" fill="#2a7f62"/><text x="380" y="35" text-anchor="middle" fill="#fff" font-weight="700">notebooks/01 … 06 (one per unit) · executed end to end on the real data</text>
+            <rect x="10" y="62" width="176" height="56" rx="10" fill="#1d2b36"/><text x="98" y="86" text-anchor="middle" fill="#fff" font-weight="700">optim.py</text><text x="98" y="104" text-anchor="middle" fill="#cbd5e1">GD · Momentum · RMSProp · Adam</text>
+            <rect x="198" y="62" width="176" height="56" rx="10" fill="#1d2b36"/><text x="286" y="86" text-anchor="middle" fill="#fff" font-weight="700">stats.py</text><text x="286" y="104" text-anchor="middle" fill="#cbd5e1">gradients · bootstrap · MLE · losses</text>
+            <rect x="386" y="62" width="176" height="56" rx="10" fill="#1d2b36"/><text x="474" y="86" text-anchor="middle" fill="#fff" font-weight="700">theory.py</text><text x="474" y="104" text-anchor="middle" fill="#cbd5e1">PAC · VC · shattering · ERM</text>
+            <rect x="574" y="62" width="176" height="56" rx="10" fill="#1d2b36"/><text x="662" y="86" text-anchor="middle" fill="#fff" font-weight="700">data.py · plotting.py</text><text x="662" y="104" text-anchor="middle" fill="#cbd5e1">loading · one figure style</text>
+            <rect x="10" y="130" width="365" height="36" rx="10" fill="#7fb8a1"/><text x="192" y="152" text-anchor="middle" fill="#0f2a20" font-weight="700">tests/ · pytest, 16 tests</text>
+            <rect x="385" y="130" width="365" height="36" rx="10" fill="#7fb8a1"/><text x="567" y="152" text-anchor="middle" fill="#0f2a20" font-weight="700">conviction (my library) · uncertainty and guarantees</text>
+            <rect x="10" y="176" width="740" height="36" rx="10" fill="#475569"/><text x="380" y="198" text-anchor="middle" fill="#fff" font-weight="700">tools/build_site.py → docs/ (GitHub Pages): index, course map, every notebook as HTML</text>
+        </svg>
+    </div>
+    <h3>Files</h3>
+    <table>
+        <thead><tr><th>File</th><th>Job</th><th>Lines</th></tr></thead>
+        <tbody>
+            <tr><th><code>src/groundwork/optim.py</code></th><td>the four optimisers, Rosenbrock and saddle test functions, softmax regression trained with any optimiser</td><td>134</td></tr>
+            <tr><th><code>src/groundwork/stats.py</code></th><td>numerical gradient, bootstrap CI, normal MLE and negative log-likelihood, loss functions</td><td>60</td></tr>
+            <tr><th><code>src/groundwork/theory.py</code></th><td>PAC and VC sample sizes, linear separability as a linear program, shattering, ERM over stumps</td><td>58</td></tr>
+            <tr><th><code>src/groundwork/data.py</code></th><td>finds and loads the competition data, stratified samples, one-hot matrix</td><td>69</td></tr>
+            <tr><th><code>tests/</code></th><td>16 tests of the package</td><td>50 + 51</td></tr>
+            <tr><th><code>notebooks/*.ipynb</code></th><td>the six units, with all outputs</td><td>6 notebooks</td></tr>
+            <tr><th><code>tools/build_site.py</code>, <code>tools/syllabus.py</code></th><td>the website and the course map (also used for chapter 09)</td><td>134</td></tr>
+        </tbody>
+    </table>
+</section>
+
+
+<section class="chapter">
+    <p class="kicker">02 · How it's built (continued)</p>
+    <h2>The notebooks on the website</h2>
+    <p class="lead">Each notebook is published with its code, outputs and figures, exactly as executed. These are screenshots of the site.</p>
+    <figure class="fig-short"><img src="figures/nb-01.png" alt=""><figcaption><b>Fig. 1</b> · <b>Notebook 01</b>, evaluation and performance: the stratified split and the tree's accuracy against balanced accuracy.</figcaption></figure>
+    <figure class="fig-short"><img src="figures/nb-03.png" alt=""><figcaption><b>Fig. 2</b> · <b>Notebook 03</b>, correlation analysis: the heatmap code and its output.</figcaption></figure>
+    <figure class="fig-short"><img src="figures/nb-04.png" alt=""><figcaption><b>Fig. 3</b> · <b>Notebook 04</b>, the chain rule worked step by step, and the unit's syllabus table at the end of the notebook.</figcaption></figure>
+    <figure class="fig-short"><img src="figures/nb-05.png" alt=""><figcaption><b>Fig. 4</b> · <b>Notebook 05</b>, confidence intervals: t-interval, bootstrap and <code>conviction</code> side by side.</figcaption></figure>
+    <figure class="fig-short"><img src="figures/nb-06.png" alt=""><figcaption><b>Fig. 5</b> · <b>Notebook 06</b>, PAC learning: the bound and its empirical check.</figcaption></figure>
+    <figure class="fig-short"><img src="figures/site-map.png" alt=""><figcaption><b>Fig. 6</b> · <b>The course map</b> on the site: every topic links to its notebook section.</figcaption></figure>
+</section>
+
+<section class="chapter">
+    <p class="kicker">03 · Unit I</p>
+    <h2>Machine learning foundations and NumPy</h2>
+    <p class="lead">Unit I: what machine learning is, AI vs ML vs data science, supervised / unsupervised / reinforcement learning, parametric vs non-parametric and generative vs discriminative models, the workflow, train–test evaluation, overfitting and underfitting, the bias–variance trade-off, applications, and NumPy for numerical computing. <span class="tag">Notebook 01</span></p>
+    <h3>The problem as a learning task</h3>
+    <p>Mitchell's definition fixes the task (classify a field's irrigation need), the experience (630,000 labelled fields) and the performance measure (balanced accuracy). Supervised learning (logistic regression, 72% training accuracy on the numeric features) and unsupervised learning (K-Means with three clusters) were both run on the same data. K-Means never saw the labels, and its clusters only partly match the classes: one cluster holds most High fields, but every cluster mixes Low and Medium.</p>
+    <h3>Model categories, measured</h3>
+    <table class="num">
+        <thead><tr><th>Model</th><th>Category</th><th>Stored size</th></tr></thead>
+        <tbody>
+            <tr><th>Logistic regression</th><td>parametric, discriminative</td><td>1.0 KB</td></tr>
+            <tr><th>Gaussian Naive Bayes</th><td>parametric, generative</td><td>1.1 KB</td></tr>
+            <tr><th>k-NN (k = 15)</th><td>non-parametric</td><td>2,240 KB (it stores the training set)</td></tr>
+        </tbody>
+    </table>
+    <h3>Evaluation, overfitting and the bias–variance trade-off</h3>
+    <p>A depth-8 tree on a stratified 75/25 split reaches 97.6% accuracy but only 92.2% balanced accuracy. Its High recall is 0.81 against 0.99 for Low, which is why balanced accuracy is the right metric for this data.</p>
+    <div class="grid2">
+        <figure class=""><img src="figures/g01-overfitting.png" alt=""><figcaption><b>Fig. 7</b> · <b>Overfitting and underfitting.</b> Training error keeps falling with depth; test error is lowest at depth 7.</figcaption></figure>
+        <figure class=""><img src="figures/g01-bias-variance.png" alt=""><figcaption><b>Fig. 8</b> · <b>Bias² and variance, measured.</b> 30 bootstrap trees per depth: bias² falls from 0.22 to 0.02, variance rises, and the sum is lowest at depth 6.</figcaption></figure>
+    </div>
+    <h3>NumPy</h3>
+    <p>The notebook covers creating arrays, element-wise operations, masks and fancy indexing, the broadcasting rule (standardising a 20,000 × 3 matrix in one line, and a shape that can't broadcast), matrix operations (solving a least-squares fit with the normal equation) and the seeded random generator. A vectorised sum over 400,000 values ran 22× faster than the Python loop.</p>
+</section>
+
+<section class="chapter">
+    <p class="kicker">04 · Unit II</p>
+    <h2>Pandas for data handling</h2>
+    <p class="lead">Unit II: Series and DataFrames, reading and writing CSV, inspecting a dataset, <code>loc</code> vs <code>iloc</code>, boolean filtering, and Matplotlib: line, bar, histogram, scatter and pie charts, customisation and subplots. <span class="tag">Notebook 02</span></p>
+    <p>Reading all 630,000 rows takes 0.24 s. Inspection finds no missing values and no duplicates, and shows that High is 3.3% of fields. Boolean filtering already finds a strong rule: among dry (moisture &lt; 20%), hot (&gt; 35 °C) fields, High is 22.8%, seven times its overall share. Grouping by growth stage and mulching shows that unmulched vegetative and flowering crops are where High lives (10.6–10.8%), compared with under 2% when mulched.</p>
+    <div class="grid2">
+        <figure class=""><img src="figures/g02-line.png" alt=""><figcaption><b>Fig. 9</b> · <b>Line plot.</b> Share of each class across soil-moisture bins: a sharp switch at about 25%.</figcaption></figure>
+        <figure class=""><img src="figures/g02-bar.png" alt=""><figcaption><b>Fig. 10</b> · <b>Bar plot.</b> Fields per crop, stacked by need: crops barely differ.</figcaption></figure>
+    </div>
+    <div class="grid2">
+        <figure class=""><img src="figures/g02-hist.png" alt=""><figcaption><b>Fig. 11</b> · <b>Histogram.</b> Temperature per class: High fields are concentrated above about 30 °C.</figcaption></figure>
+        <figure class=""><img src="figures/g02-custom.png" alt=""><figcaption><b>Fig. 12</b> · <b>A customised plot</b> made to make one point: 84% of High fields sit in the dry, hot box.</figcaption></figure>
+    </div>
+    <div class="grid2">
+        <figure class=""><img src="figures/g02-scatter.png" alt=""><figcaption><b>Fig. 13</b> · <b>Scatter plot.</b> High need sits in the dry, hot corner.</figcaption></figure>
+        <figure class=""><img src="figures/g02-pie.png" alt=""><figcaption><b>Fig. 14</b> · <b>Pie chart</b> of the class balance.</figcaption></figure>
+    </div>
+    <figure class="fig-short"><img src="figures/g02-subplots.png" alt=""><figcaption><b>Fig. 15</b> · <b>Subplots.</b> Six features per class side by side: moisture, temperature, rainfall and wind separate the classes; humidity and pH don't.</figcaption></figure>
+</section>
+
+<section class="chapter">
+    <p class="kicker">05 · Unit III</p>
+    <h2>Exploratory data analysis</h2>
+    <p class="lead">Unit III: types of data, loading and inspecting, univariate and bivariate analysis, correlation and multicollinearity, skewness and kurtosis, patterns, anomalies and trends, and how EDA feeds the modelling. <span class="tag">Notebook 03</span></p>
+    <div class="grid2">
+        <figure class=""><img src="figures/g03-boxplots.png" alt=""><figcaption><b>Fig. 16</b> · <b>Box plots</b> of the four features that move with need.</figcaption></figure>
+        <figure class=""><img src="figures/g03-violin.png" alt=""><figcaption><b>Fig. 17</b> · <b>Violin plot.</b> Moisture by growth stage and need.</figcaption></figure>
+    </div>
+    <div class="grid2">
+        <figure class=""><img src="figures/g03-heatmap.png" alt=""><figcaption><b>Fig. 18</b> · <b>Correlation heatmap.</b> Need correlates with moisture (−0.46), wind (0.26), temperature (0.25) and rainfall (−0.11); the features hardly correlate with each other.</figcaption></figure>
+        <div>
+            <h3>Multicollinearity</h3>
+            <p>Every feature has a variance inflation factor between 1.000 and 1.006: the features are independent, so linear-model coefficients will be stable. A deliberately added near-copy of soil moisture shows what a real problem looks like: VIF 219 for both columns.</p>
+            <h3>Skewness and kurtosis</h3>
+            <p>All skewness values are within ±0.12. Excess kurtosis is between −0.94 and −1.26, close to a uniform distribution's −1.2. The features are bounded and flat, not bell-shaped.</p>
+            <h3>Anomalies</h3>
+            <p>Neither the IQR rule nor |z| &gt; 3 flags a single real value. To show that the rules work, 40 sensor faults were injected into a copy (a stuck probe, Fahrenheit temperatures, negative rainfall). The z-score rule caught 39 and the IQR rule 36. The misses were values that land inside the normal range.</p>
+        </div>
+    </div>
+    <div class="grid2">
+        <figure class=""><img src="figures/g03-line.png" alt=""><figcaption><b>Fig. 19</b> · <b>A threshold, not a slope.</b> Need only jumps in the driest 10% of fields, and the vegetative and flowering stages sit far above the other two.</figcaption></figure>
+        <figure class=""><img src="figures/g03-pattern.png" alt=""><figcaption><b>Fig. 20</b> · <b>An interaction.</b> Mulching cuts the High share from about 11% to under 2%, but only in the thirsty stages.</figcaption></figure>
+    </div>
+    <div class="grid2">
+        <figure class=""><img src="figures/g03-skew.png" alt=""><figcaption><b>Fig. 21</b> · <b>Skewness and kurtosis</b> against a normal curve with the same mean and SD.</figcaption></figure>
+        <figure class=""><img src="figures/g03-trends.png" alt=""><figcaption><b>Fig. 22</b> · <b>Trends.</b> Mean need rises with temperature and falls with moisture (95% error bars).</figcaption></figure>
+    </div>
+    <h3>What the EDA decided</h3>
+    <table>
+        <thead><tr><th>Finding</th><th>Consequence for modelling</th></tr></thead>
+        <tbody>
+            <tr><th>No missing values or duplicates</th><td>no imputation</td></tr>
+            <tr><th>High is 3.3% of rows</th><td>stratified splits; optimise balanced accuracy</td></tr>
+            <tr><th>Thresholds and a stage × mulching interaction</th><td>trees fit naturally; linear models need engineered features</td></tr>
+            <tr><th>Independent, bounded features</th><td>stable coefficients; scaling is safe; no outlier removal</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="chapter">
+    <p class="kicker">06 · Unit IV</p>
+    <h2>Linear algebra, probability and calculus</h2>
+    <p class="lead">Unit IV: scalars to tensors, eigenvalues and eigenvectors, random variables and distributions, statistical measures, joint, marginal and conditional probability, Bayes' theorem and likelihood, functions, partial derivatives, the gradient and the chain rule. <span class="tag">Notebook 04</span></p>
+    <h3>Linear algebra</h3>
+    <p>One field is a vector, the table a matrix and a stack of per-region matrices a 5 × 1000 × 11 tensor. A hand-made "dryness" score (one dot product with weights on moisture, temperature, rainfall and wind) already ranks the classes: mean −0.55 for Low, 0.67 for Medium, 2.03 for High. Power iteration written from scratch finds the top eigenvalue of the feature covariance, 1.107249, identical to <code>np.linalg.eigh</code>. All eigenvalues lie between 0.93 and 1.11: there is no dominant direction, confirming the independence found in the EDA.</p>
+    <div class="grid2">
+        <figure class=""><img src="figures/g04-eigen.png" alt=""><figcaption><b>Fig. 23</b> · <b>Eigenvectors are only stretched</b> when the unit circle is multiplied by A.</figcaption></figure>
+        <figure class=""><img src="figures/g04-distributions.png" alt=""><figcaption><b>Fig. 24</b> · <b>Distributions.</b> The class PMF, and temperature against uniform and normal fits: the uniform fits.</figcaption></figure>
+    </div>
+    <h3>Probability and Bayes' theorem</h3>
+    <table class="num">
+        <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
+        <tbody>
+            <tr><th>P(High) (prior)</th><td>0.0333</td></tr>
+            <tr><th>P(dry | High) (likelihood)</th><td>0.6444</td></tr>
+            <tr><th>P(dry) (evidence)</th><td>0.1909</td></tr>
+            <tr><th>P(High | dry) by Bayes' theorem / counted directly</th><td>0.1125 / 0.1125</td></tr>
+            <tr><th>P(High | no mulch) vs P(High | mulch)</th><td>0.0585 vs 0.0079: dependent</td></tr>
+        </tbody>
+    </table>
+    <div class="grid2">
+        <figure class=""><img src="figures/g04-bayes.png" alt=""><figcaption><b>Fig. 25</b> · <b>Updating a belief</b> one piece of evidence at a time (naive assumption) reaches 0.51; the dashed line, counted directly, is 0.63.</figcaption></figure>
+        <figure class=""><img src="figures/g04-likelihood.png" alt=""><figcaption><b>Fig. 26</b> · <b>Probability vs likelihood:</b> the same normal formula read in two directions; the likelihood peaks at the sample mean.</figcaption></figure>
+    </div>
+    <h3>Calculus</h3>
+    <p>The logistic-loss gradient was derived by hand, ∇L = Xᵀ(σ(Xw) − y)/n, and compared with central finite differences on all 12 parameters: the largest difference is 8.25 × 10⁻¹². The chain rule was done step by step for one field and one weight: dL/dp × dp/du × du/dw = −0.130726, the simplified (p − y)·x = −0.130726, and the numerical derivative = −0.130726.</p>
+    <figure class="fig-short"><img src="figures/g04-gradient.png" alt=""><figcaption><b>Fig. 27</b> · <b>The loss surface</b> over two weights; the white arrows (negative gradient) point to low loss: negative weight on moisture, positive on temperature.</figcaption></figure>
+</section>
+
+<section class="chapter">
+    <p class="kicker">07 · Unit V</p>
+    <h2>Statistics for machine learning and optimisation</h2>
+    <p class="lead">Unit V: sampling and population, hypothesis testing, confidence intervals, correlation, maximum likelihood, loss functions, convex and non-convex functions, minima and saddle points, gradient descent and its learning rate and variants, and the Momentum, RMSProp and Adam optimisers. <span class="tag">Notebook 05</span></p>
+    <h3>Sampling, tests and intervals</h3>
+    <div class="grid2">
+        <figure class=""><img src="figures/g05-sampling.png" alt=""><figcaption><b>Fig. 28</b> · <b>The central limit theorem, measured.</b> Sample means of a flat feature are bell-shaped; their spread matches σ/√n (7.38 vs 7.32 at n = 5; 1.154 vs 1.158 at n = 200).</figcaption></figure>
+        <figure class=""><img src="figures/g05-permutation.png" alt=""><figcaption><b>Fig. 29</b> · <b>Permutation test.</b> None of 5,000 label shuffles comes near the real 9.16 °C difference between High and Low fields.</figcaption></figure>
+    </div>
+    <table class="num">
+        <thead><tr><th>Test</th><th>Result</th></tr></thead>
+        <tbody>
+            <tr><th>Welch t-test, temperature High vs Low</th><td>t = 17.92, p = 5.6 × 10⁻⁴¹ → reject H₀</td></tr>
+            <tr><th>χ² test, mulching vs need</th><td>χ² = 354.8, p = 9.0 × 10⁻⁷⁸ → dependent</td></tr>
+            <tr><th>Welch t-test, soil pH High vs Low</th><td>p = 0.994 → keep H₀ (no difference)</td></tr>
+            <tr><th>Type I error over 2,000 A/A tests at α = 0.05</th><td>0.053</td></tr>
+            <tr><th>95% CI for mean temperature of High fields (t / bootstrap / <code>conviction</code>)</th><td>[33.63, 35.53] / [33.61, 35.47] / [33.63, 35.50]; all contain the true 34.57</td></tr>
+            <tr><th><code>conviction</code>: P(High − Low difference &gt; 9 °C)</th><td>0.631, so not decided at 95% confidence</td></tr>
+        </tbody>
+    </table>
+    <figure class="fig-short"><img src="figures/g05-ci-coverage.png" alt=""><figcaption><b>Fig. 30</b> · <b>What 95% means.</b> 500 t-intervals from samples of 60 fields; 93.6% contain the true mean.</figcaption></figure>
+    <h3>Estimation and losses</h3>
+    <p>For temperature, the closed-form MLE (μ = 27.1160, σ = 8.5716) and a Nelder–Mead minimisation of the negative log-likelihood (27.1159, 8.5716) agree. With one broken reading of 999 among 100 moisture values, the best constant under MSE is the mean, 43.26, while MAE gives the median, 29.7: one outlier moves only the first.</p>
+    <figure class="fig-short"><img src="figures/g05-convex.png" alt=""><figcaption><b>Fig. 31</b> · <b>Convex vs non-convex.</b> On the non-convex curve, GD ends in a different minimum depending on where it starts.</figcaption></figure>
+    <div class="grid2">
+        <figure class=""><img src="figures/g05-losses.png" alt=""><figcaption><b>Fig. 32</b> · <b>Loss functions:</b> MSE, MAE and Huber; 0–1, log and hinge loss against the margin.</figcaption></figure>
+        <figure class=""><img src="figures/g05-saddle.png" alt=""><figcaption><b>Fig. 33</b> · <b>A saddle point:</b> Hessian eigenvalues −2 and 2; gradient descent stalls near it, then escapes.</figcaption></figure>
+    </div>
+    <h3>Gradient descent and the optimisers</h3>
+    <div class="grid2">
+        <figure class=""><img src="figures/g05-learning-rate.png" alt=""><figcaption><b>Fig. 34</b> · <b>The learning rate.</b> Too small is slow; 3.0 is fast; 12 overshoots and bounces.</figcaption></figure>
+        <figure class=""><img src="figures/g05-gd-variants.png" alt=""><figcaption><b>Fig. 35</b> · <b>Batch, mini-batch and stochastic GD</b> after the same 15 epochs.</figcaption></figure>
+    </div>
+    <div class="grid2">
+        <figure class=""><img src="figures/g05-rosenbrock.png" alt=""><figcaption><b>Fig. 36</b> · <b>Rosenbrock valley, 2,000 steps.</b> Adam ends 3 × 10⁻⁶ from the minimum and Momentum 5 × 10⁻⁵; RMSProp bounces along the floor (0.14 away); GD crawls (0.58).</figcaption></figure>
+        <figure class=""><img src="figures/g05-optimisers-real.png" alt=""><figcaption><b>Fig. 37</b> · <b>Softmax regression on the irrigation data.</b> With tuned learning rates all four reach 0.289–0.290 against scikit-learn's 0.2865.</figcaption></figure>
+    </div>
+    <p>The honest conclusion: on a convex, well-scaled problem the learning rate matters more than the optimiser; the adaptive methods pull ahead on badly conditioned landscapes like Rosenbrock.</p>
+</section>
+
+<section class="chapter">
+    <p class="kicker">08 · Unit VI</p>
+    <h2>Statistical learning theory</h2>
+    <p class="lead">Unit VI: well-posed learning problems, the components of a learning system, the statistical learning framework, empirical risk minimisation, overfitting and generalisation, inductive bias, prior knowledge, PAC learning, sample complexity and the VC dimension, the No Free Lunch theorem, and choosing algorithms with Occam's razor. <span class="tag">Notebook 06</span></p>
+    <p>With the 630,000 fields standing in for the unknown distribution, the true risk of a hypothesis can be computed exactly. For most of the unit the task is binary: does the field need water (Medium or High, 41.3%)? The first hypothesis class is the 400 decision stumps on soil moisture; the best of them ("needs water when moisture &lt; 25.2%") has a true risk of 0.222.</p>
+    <div class="grid2">
+        <figure class=""><img src="figures/g06-erm.png" alt=""><figcaption><b>Fig. 38</b> · <b>ERM.</b> With 20 examples the empirical risk (0.18) is far below the true risk (0.29); by 10,000 the gap is 0.0005.</figcaption></figure>
+        <figure class=""><img src="figures/g06-inductive-bias.png" alt=""><figcaption><b>Fig. 39</b> · <b>Inductive bias.</b> Four learners, one dataset, four different answers on every unseen point.</figcaption></figure>
+    </div>
+    <h3>Overfitting needs noise</h3>
+    <table class="num">
+        <thead><tr><th>Training labels</th><th>n</th><th>Depth-6 tree, test risk</th><th>Unlimited tree, empirical / test risk</th></tr></thead>
+        <tbody>
+            <tr><th>clean</th><td>40,000</td><td>0.013</td><td>0.000 / 0.025</td></tr>
+            <tr><th>20% flipped</th><td>1,000</td><td>0.168</td><td>0.000 / 0.242</td></tr>
+            <tr><th>20% flipped</th><td>40,000</td><td>0.015</td><td>0.000 / 0.235</td></tr>
+        </tbody>
+    </table>
+    <p>With clean labels the tree that memorises does no harm; with noisy labels it memorises the noise and more data doesn't help, while the restricted tree keeps improving.</p>
+    <div class="grid2">
+        <figure class=""><img src="figures/g06-prior.png" alt=""><figcaption><b>Fig. 40</b> · <b>Prior knowledge.</b> Monotonic constraints ("wetter never needs more water") add 2–4 points of balanced accuracy below 10,000 fields, and 0.1 points at 50,000.</figcaption></figure>
+        <figure class=""><img src="figures/g06-vc.png" alt=""><figcaption><b>Fig. 41</b> · <b>VC dimension.</b> Lines shatter 3 points but not 4 (the XOR labellings), checked with a linear program.</figcaption></figure>
+    </div>
+    <h3>PAC learning, tested</h3>
+    <p>For |H| = 400, ε = 0.02 and δ = 0.05, the agnostic bound asks for m = 12,101 examples. In 300 independent samples of that size, the largest gap between empirical and true risk over all 400 stumps exceeded ε in <b>0</b> of them (the worst gap seen was 0.0165). Then a practical guarantee: my library <code>conviction</code>'s <code>RiskGuard</code>, calibrated on 18,000 fields, certified that among fields auto-labelled "not High" at most 0.5% are wrong, with 95% confidence. It auto-labels 89.9% of 18,000 <i>unseen</i> fields, with an error rate of 0.365%.</p>
+    <h3>No Free Lunch and choosing algorithms</h3>
+    <p>On a world of 8 inputs, training on 4 and averaging over all 256 possible labellings of the rest, every learner scores exactly 0.5 off the training set: always-0, majority, 1-NN, a decision tree and an anti-learner. In practice the winner depends on the data: k-NN wins on moons (0.941) and circles (0.991), logistic regression on a linear problem (0.919) and the tree on the irrigation data (0.937). The one-standard-error rule picks depth 7, which is also the best depth here.</p>
+    <figure class="fig-short"><img src="figures/g06-sample-complexity.png" alt=""><figcaption><b>Fig. 42</b> · <b>Sample complexity</b> of finite classes, realisable and agnostic.</figcaption></figure>
+    <figure class="fig-short"><img src="figures/g06-occam.png" alt=""><figcaption><b>Fig. 43</b> · <b>Occam's razor:</b> the one-standard-error rule on tree depth.</figcaption></figure>
+</section>
+
+<section class="chapter">
+    <p class="kicker">09 · Syllabus mapping</p>
+    <h2>Every topic of the syllabus</h2>
+    <p class="lead">Generated from <code>tools/syllabus.py</code>, the same file that builds the course map on the website, so the two cannot disagree. "Where" gives the notebook and section.</p>
+    <h3>Unit I: Machine Learning Foundation <span class="tag">12 topics</span></h3><p style="font-size:8.5pt;color:var(--muted)">Notebook <code>01_foundations_numpy.ipynb</code> · Machine learning foundations and NumPy</p><table class="t-map"><thead><tr><th>Syllabus topic</th><th>Where</th></tr></thead><tbody><tr><th>Introduction to machine learning</th><td class="where">01 § 1</td></tr><tr><th>AI vs machine learning vs data science</th><td class="where">01 § 2</td></tr><tr><th>Supervised, unsupervised and reinforcement learning</th><td class="where">01 § 3</td></tr><tr><th>Parametric vs non-parametric models</th><td class="where">01 § 4</td></tr><tr><th>Generative vs discriminative models</th><td class="where">01 § 4</td></tr><tr><th>Machine learning workflow</th><td class="where">01 § 5</td></tr><tr><th>Train–test split, overview of evaluation metrics</th><td class="where">01 § 6</td></tr><tr><th>Overfitting and underfitting</th><td class="where">01 § 6</td></tr><tr><th>Bias–variance trade-off (measured with 30 bootstrap fits)</th><td class="where">01 § 6</td></tr><tr><th>Applications and use cases</th><td class="where">01 § 7</td></tr><tr><th>NumPy: why NumPy, creating arrays, operations</th><td class="where">01 § 8</td></tr><tr><th>Broadcasting rule, matrix operations, random module</th><td class="where">01 § 8</td></tr></tbody></table><h3>Unit II: Pandas for Data Handling <span class="tag">7 topics</span></h3><p style="font-size:8.5pt;color:var(--muted)">Notebook <code>02_pandas_matplotlib.ipynb</code> · Pandas for data handling</p><table class="t-map"><thead><tr><th>Syllabus topic</th><th>Where</th></tr></thead><tbody><tr><th>Pandas Series and DataFrame</th><td class="where">02 § 1</td></tr><tr><th>Reading and writing CSV files</th><td class="where">02 § 2</td></tr><tr><th>Inspecting datasets</th><td class="where">02 § 3</td></tr><tr><th>Selection: loc vs iloc; boolean filtering</th><td class="where">02 § 4</td></tr><tr><th>Line, bar, histogram, scatter and pie charts</th><td class="where">02 § 5</td></tr><tr><th>Customising plots</th><td class="where">02 § 6</td></tr><tr><th>Subplots</th><td class="where">02 § 7</td></tr></tbody></table><h3>Unit III: Exploratory Data Analysis <span class="tag">8 topics</span></h3><p style="font-size:8.5pt;color:var(--muted)">Notebook <code>03_eda.ipynb</code> · Exploratory data analysis</p><table class="t-map"><thead><tr><th>Syllabus topic</th><th>Where</th></tr></thead><tbody><tr><th>Types of data (quantitative, qualitative)</th><td class="where">03 § 1</td></tr><tr><th>Loading data and initial inspection</th><td class="where">03 § 2</td></tr><tr><th>Univariate analysis: histogram, box plot, count plot</th><td class="where">03 § 3</td></tr><tr><th>Bivariate analysis: scatter, line, violin plots</th><td class="where">03 § 4</td></tr><tr><th>Correlation heatmaps and multicollinearity (VIF)</th><td class="where">03 § 5</td></tr><tr><th>Skewness and kurtosis</th><td class="where">03 § 6</td></tr><tr><th>Patterns, anomalies (outliers) and trends</th><td class="where">03 § 7</td></tr><tr><th>EDA workflow integration</th><td class="where">03 § 8</td></tr></tbody></table><h3>Unit IV: Linear Algebra and Calculus <span class="tag">9 topics</span></h3><p style="font-size:8.5pt;color:var(--muted)">Notebook <code>04_linear_algebra_probability_calculus.ipynb</code> · Linear algebra, probability and calculus</p><table class="t-map"><thead><tr><th>Syllabus topic</th><th>Where</th></tr></thead><tbody><tr><th>Data structures: scalar, vector, matrix, tensor</th><td class="where">04 § 1.1</td></tr><tr><th>Eigenvalues and eigenvectors (power iteration from scratch)</th><td class="where">04 § 1.2</td></tr><tr><th>Random variables and probability distributions</th><td class="where">04 § 2.1–2.2</td></tr><tr><th>Statistical measures</th><td class="where">04 § 2.3</td></tr><tr><th>Types of probability: joint, marginal, conditional</th><td class="where">04 § 2.4</td></tr><tr><th>Bayes&#x27; theorem and inference</th><td class="where">04 § 3.1</td></tr><tr><th>Likelihood vs probability</th><td class="where">04 § 3.2</td></tr><tr><th>Functions, partial derivatives and the gradient</th><td class="where">04 § 4.1–4.3</td></tr><tr><th>The chain rule</th><td class="where">04 § 4.4</td></tr></tbody></table><h3>Unit V: Statistics for ML <span class="tag">11 topics</span></h3><p style="font-size:8.5pt;color:var(--muted)">Notebook <code>05_statistics_optimisation.ipynb</code> · Statistics for ML and optimisation</p><table class="t-map"><thead><tr><th>Syllabus topic</th><th>Where</th></tr></thead><tbody><tr><th>Sampling and population</th><td class="where">05 § 1.1</td></tr><tr><th>Hypothesis testing</th><td class="where">05 § 1.2</td></tr><tr><th>Confidence intervals</th><td class="where">05 § 1.3</td></tr><tr><th>Correlation</th><td class="where">05 § 1.4</td></tr><tr><th>Maximum likelihood estimation</th><td class="where">05 § 2.1</td></tr><tr><th>Loss (cost) functions</th><td class="where">05 § 2.2</td></tr><tr><th>Convex vs non-convex functions</th><td class="where">05 § 3.1</td></tr><tr><th>Minima and saddle points</th><td class="where">05 § 3.2</td></tr><tr><th>Gradient descent and the learning rate</th><td class="where">05 § 4.1–4.2</td></tr><tr><th>Variants of gradient descent (batch, stochastic, mini-batch)</th><td class="where">05 § 4.3</td></tr><tr><th>Momentum, RMSProp and Adam (from scratch)</th><td class="where">05 § 5</td></tr></tbody></table><h3>Unit VI: Statistical Learning Theory <span class="tag">10 topics</span></h3><p style="font-size:8.5pt;color:var(--muted)">Notebook <code>06_learning_theory.ipynb</code> · Statistical learning theory</p><table class="t-map"><thead><tr><th>Syllabus topic</th><th>Where</th></tr></thead><tbody><tr><th>Well-posed learning problems (T-P-E)</th><td class="where">06 § 1</td></tr><tr><th>Components of a learning system</th><td class="where">06 § 2</td></tr><tr><th>Statistical learning framework</th><td class="where">06 § 3</td></tr><tr><th>Empirical risk minimisation, overfitting and generalisation</th><td class="where">06 § 4</td></tr><tr><th>Inductive bias</th><td class="where">06 § 5</td></tr><tr><th>Role of prior knowledge</th><td class="where">06 § 6</td></tr><tr><th>PAC learning</th><td class="where">06 § 7</td></tr><tr><th>Sample complexity: finite hypothesis space and VC dimension</th><td class="where">06 § 8</td></tr><tr><th>No Free Lunch theorem</th><td class="where">06 § 9</td></tr><tr><th>Choosing algorithms; Occam&#x27;s razor</th><td class="where">06 § 10</td></tr></tbody></table>
+</section>
+
+<section class="chapter">
+    <p class="kicker">10 · Code walkthrough</p>
+    <h2>The important functions</h2>
+    <h3>Adam</h3>
+    <div class="walk">
+        <pre><span class="file">optim.py · lines 47–63</span>class Adam:
+    name = &quot;Adam&quot;
+
+    def __init__(self, lr=0.01, beta1=0.9, beta2=0.999, eps=1e-8):
+        self.lr, self.beta1, self.beta2, self.eps = lr, beta1, beta2, eps
+        self.m = self.v = None
+        self.t = 0
+
+    def step(self, w, g):
+        if self.m is None:
+            self.m, self.v = np.zeros_like(w), np.zeros_like(w)
+        self.t += 1
+        self.m = self.beta1 * self.m + (1 - self.beta1) * g
+        self.v = self.beta2 * self.v + (1 - self.beta2) * g**2
+        m_hat = self.m / (1 - self.beta1**self.t)  # bias correction: m and v start at 0
+        v_hat = self.v / (1 - self.beta2**self.t)
+        return w - self.lr * m_hat / (np.sqrt(v_hat) + self.eps)</pre>
+        <div>
+            <p>Every optimiser has the same interface, <code>step(w, g)</code>, so they are interchangeable in <code>minimize()</code> and <code>train_softmax()</code>. Adam keeps a running mean of the gradient (the momentum term <i>m</i>) and of its square (the RMSProp term <i>v</i>).</p>
+            <p>Both start at zero, so early on they are biased towards zero; dividing by 1 − βᵗ corrects that. Without it the first steps would be far too small. The test suite checks that all four optimisers find the minimum of a bowl and that Adam beats plain GD on Rosenbrock.</p>
+        </div>
+    </div>
+    <h3>Softmax regression and its gradient</h3>
+    <div class="walk">
+        <pre><span class="file">optim.py · lines 104–110</span>def cross_entropy(W, X, Y):
+    &quot;&quot;&quot;Mean cross-entropy loss and its gradient for softmax regression.
+    X has a bias column, Y is one-hot.&quot;&quot;&quot;
+    P = softmax(X @ W)
+    loss = -np.mean(np.sum(Y * np.log(P + 1e-12), axis=1))
+    grad = X.T @ (P - Y) / len(X)
+    return loss, grad</pre>
+        <div>
+            <p>The loss of a softmax model is the mean cross-entropy; its gradient with respect to the weight matrix has the compact form Xᵀ(P − Y)/n. Notebook 04 derives the same formula for the binary case through the chain rule, and <code>tests/test_optim.py</code> checks it against finite differences.</p>
+            <p><code>softmax()</code> subtracts each row's maximum before exponentiating; without that, large scores overflow to infinity.</p>
+        </div>
+    </div>
+    <pre><span class="file">optim.py · lines 113–129</span>def train_softmax(X, y, optimizer, epochs=30, batch_size=None, seed=0):
+    &quot;&quot;&quot;batch_size=None is full-batch GD, 1 is SGD, anything else is mini-batch.&quot;&quot;&quot;
+    rng = np.random.default_rng(seed)
+    X = np.hstack([np.ones((len(X), 1)), X])
+    k = int(y.max()) + 1
+    Y = np.eye(k)[y]
+    W = np.zeros((X.shape[1], k))
+    bs = len(X) if batch_size is None else batch_size
+    history = [cross_entropy(W, X, Y)[0]]
+    for _ in range(epochs):
+        order = rng.permutation(len(X))
+        for start in range(0, len(X), bs):
+            idx = order[start:start + bs]
+            _, g = cross_entropy(W, X[idx], Y[idx])
+            W = optimizer.step(W, g)
+        history.append(cross_entropy(W, X, Y)[0])
+    return W, np.array(history)</pre>
+    <p>One function covers all three gradient-descent variants: <code>batch_size=None</code> is batch GD, 1 is SGD, anything else is mini-batch; the data is reshuffled every epoch.</p>
+</section>
+
+<section>
+    <h3>Shattering and the VC dimension</h3>
+    <div class="walk">
+        <pre><span class="file">theory.py · lines 26–32</span>def linearly_separable(X, y):
+    &quot;&quot;&quot;Is there w, b with y_i (w.x_i + b) &gt;= 1 for all i? Solved as an LP feasibility problem.&quot;&quot;&quot;
+    X = np.asarray(X, dtype=float)
+    s = np.where(np.asarray(y) &gt; 0, 1.0, -1.0)
+    A = -s[:, None] * np.hstack([X, np.ones((len(X), 1))])
+    res = linprog(np.zeros(X.shape[1] + 1), A_ub=A, b_ub=-np.ones(len(X)), bounds=[(None, None)] * (X.shape[1] + 1))
+    return res.status == 0</pre>
+        <div>
+            <p>"Can a line separate these labels?" is a linear-programming feasibility question: find w and b such that every point is on the right side with margin 1. If the LP is feasible, the labelling is realisable.</p>
+            <p><code>shattered()</code> tries every one of the 2ⁿ labellings; the class shatters the points only if all of them are feasible. For four corners of a square, the two XOR labellings fail, so lines in the plane have VC dimension 3.</p>
+        </div>
+    </div>
+    <pre><span class="file">theory.py · lines 35–40</span>def shattered(X):
+    &quot;&quot;&quot;Can lines in the plane realise every one of the 2^n labelings of these points?&quot;&quot;&quot;
+    X = np.asarray(X, dtype=float)
+    failed = [labels for labels in product([0, 1], repeat=len(X))
+              if len(set(labels)) &gt; 1 and not linearly_separable(X, labels)]
+    return len(failed) == 0, failed</pre>
+    <h3>PAC sample size and ERM</h3>
+    <div class="walk">
+        <pre><span class="file">theory.py · lines 13–18</span>def pac_sample_size(h_size, eps, delta, realizable=True):
+    &quot;&quot;&quot;Training examples needed so that, with probability &gt;= 1 - delta, the learned
+    hypothesis has true error &lt;= eps (realizable) or within eps of the best (agnostic).&quot;&quot;&quot;
+    if realizable:
+        return int(np.ceil((np.log(h_size) + np.log(1 / delta)) / eps))
+    return int(np.ceil((np.log(h_size) + np.log(2 / delta)) / (2 * eps**2)))</pre>
+        <div>
+            <p>The two classic finite-class bounds: realisable, (ln|H| + ln(1/δ))/ε, and agnostic, (ln|H| + ln(2/δ))/(2ε²). Notebook 06 uses the agnostic one because no stump classifies every field correctly, and checks it on 300 samples.</p>
+        </div>
+    </div>
+    <pre><span class="file">theory.py · lines 49–58</span>def erm_stump(x, y, thresholds=None):
+    &quot;&quot;&quot;Empirical risk minimisation: pick the stump with the lowest training error.&quot;&quot;&quot;
+    thresholds = np.unique(x) if thresholds is None else thresholds
+    best = (np.inf, None, None)
+    for t in thresholds:
+        for sign in (1, -1):
+            risk = np.mean(stump_predict(x, t, sign) != y)
+            if risk &lt; best[0]:
+                best = (risk, t, sign)
+    return best</pre>
+    <h3>The bootstrap</h3>
+    <div class="walk">
+        <pre><span class="file">stats.py · lines 17–22</span>def bootstrap_ci(values, stat=np.mean, n_boot=2000, level=0.95, seed=0):
+    rng = np.random.default_rng(seed)
+    values = np.asarray(values)
+    boots = np.array([stat(rng.choice(values, len(values))) for _ in range(n_boot)])
+    lo, hi = np.quantile(boots, [(1 - level) / 2, 1 - (1 - level) / 2])
+    return stat(values), lo, hi</pre>
+        <div>
+            <p>Resample the data with replacement, recompute the statistic, and read the interval off the quantiles of the resampled values. The test suite checks that it covers the true mean in at least 50 of 60 repeated experiments.</p>
+        </div>
+    </div>
+</section>
+
+<section class="chapter">
+    <p class="kicker">11 · Testing</p>
+    <h2>What was checked</h2>
+    <p class="lead">Three layers: unit tests of the package, checks inside the notebooks that compare each from-scratch result with an independent answer, and a full execution of every notebook on a fresh kernel.</p>
+    <h3>1. Unit tests (pytest)</h3>
+    <table>
+        <thead><tr><th>Test</th><th>Checks</th><th>Result</th></tr></thead>
+        <tbody>
+            <tr><th><code>test_optim.py</code></th><td>every optimizer finds the minimum of a bowl[opt0]</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>every optimizer finds the minimum of a bowl[opt1]</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>every optimizer finds the minimum of a bowl[opt2]</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>every optimizer finds the minimum of a bowl[opt3]</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>gd diverges when the learning rate is too big</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>rosenbrock gradient matches finite differences</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>adam gets closer to rosenbrock minimum than plain gd</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>softmax gradient is correct</td><td class="ok">Pass</td></tr><tr><th><code>test_optim.py</code></th><td>softmax regression learns separable blobs</td><td class="ok">Pass</td></tr><tr><th><code>test_stats_theory.py</code></th><td>mle normal matches numpy population formulas</td><td class="ok">Pass</td></tr><tr><th><code>test_stats_theory.py</code></th><td>mle minimises the negative log likelihood</td><td class="ok">Pass</td></tr><tr><th><code>test_stats_theory.py</code></th><td>bootstrap interval contains the true mean most of the time</td><td class="ok">Pass</td></tr><tr><th><code>test_stats_theory.py</code></th><td>huber is quadratic inside and linear outside</td><td class="ok">Pass</td></tr><tr><th><code>test_stats_theory.py</code></th><td>pac bounds grow with hypotheses and shrink with eps</td><td class="ok">Pass</td></tr><tr><th><code>test_stats_theory.py</code></th><td>lines shatter three points but not four</td><td class="ok">Pass</td></tr><tr><th><code>test_stats_theory.py</code></th><td>erm stump finds a perfect threshold</td><td class="ok">Pass</td></tr>
+        </tbody>
+    </table>
+    <pre class="term"><span class="file">$ pytest -q</span>................  [100%]
+16 passed in 1.62s</pre>
+    <h3>2. Checks inside the notebooks</h3>
+    <table>
+        <thead><tr><th>What</th><th>Compared with</th><th>Result</th></tr></thead>
+        <tbody>
+            <tr><th>Hand-derived logistic gradient</th><td>central finite differences, 12 parameters</td><td class="ok">max difference 8.25 × 10⁻¹²</td></tr>
+            <tr><th>Chain rule, one weight</th><td>simplified formula and numerical derivative</td><td class="ok">all −0.130726</td></tr>
+            <tr><th>Power iteration</th><td><code>np.linalg.eigh</code></td><td class="ok">λ = 1.107249 both, |cos| = 1.0</td></tr>
+            <tr><th>Normal MLE (closed form)</th><td>Nelder–Mead on the negative log-likelihood</td><td class="ok">agree to 4 decimals</td></tr>
+            <tr><th>Bayes' theorem</th><td>direct counting</td><td class="ok">0.1125 both</td></tr>
+            <tr><th>Four optimisers</th><td>scikit-learn L-BFGS on the same loss</td><td class="ok">within 0.004</td></tr>
+            <tr><th>PAC bound</th><td>300 samples of the bound's size</td><td class="ok">0 failures (5% allowed)</td></tr>
+            <tr><th><code>RiskGuard</code> certificate</th><td>18,000 unseen fields</td><td class="ok">0.365% error, promised ≤ 0.5%</td></tr>
+            <tr><th>Type I error at α = 0.05</th><td>2,000 A/A tests</td><td class="ok">0.053</td></tr>
+        </tbody>
+    </table>
+    <h3>3. Notebook execution</h3>
+    <p>Every notebook was executed from top to bottom on a fresh kernel with <code>jupyter nbconvert --execute</code>, on Python 3.12 with NumPy 2.5, pandas 3.1 and scikit-learn 1.9, with no errors. Reading the outputs against the text found and fixed several wrong claims before they were published:</p>
+    <ul>
+        <li>The first bias–variance experiment used a target the features can't predict; it was replaced with one they can.</li>
+        <li>A pandas 3 change made <code>scipy.stats.zscore</code> return an array, so a per-column outlier count silently became a total. It now uses a pandas z-score.</li>
+        <li>The first optimiser comparison used untuned learning rates and suggested an order that a fair sweep didn't support.</li>
+        <li>The overfitting demo showed no overfitting at all on the clean, nearly noise-free labels, so the noisy-label version was added.</li>
+        <li>The first "linear" toy dataset turned out not to be linear.</li>
+    </ul>
+</section>
+
+<section class="chapter">
+    <p class="kicker">12 · Deployment and conclusion</p>
+    <h2>Online, and what I learned</h2>
+    <h3>Deployment</h3>
+    <table>
+        <tbody>
+            <tr><th>Website</th><td><a href="https://lushadowx.github.io/Groundwork/">https://lushadowx.github.io/Groundwork/</a>: overview, results, course map and every notebook as HTML</td></tr>
+            <tr><th>Source code</th><td><a href="https://github.com/LuShadowX/Groundwork">https://github.com/LuShadowX/Groundwork</a></td></tr>
+            <tr><th>Run locally</th><td><code>pip install -e ".[dev]"</code>, download the competition data into <code>data/</code>, then <code>pytest</code> and <code>jupyter lab notebooks/</code></td></tr>
+            <tr><th>Run on Kaggle</th><td>open a notebook with the competition attached; the first cell installs the package from GitHub</td></tr>
+            <tr><th>Rebuild the site</th><td><code>python tools/build_site.py</code></td></tr>
+        </tbody>
+    </table>
+    <p>The competition data is not in the repository: Kaggle's rules don't allow redistributing it.</p>
+    <h3>What I learned</h3>
+    <ul>
+        <li><b>A theorem is easier to trust after you've watched it hold.</b> Seeing the PAC bound survive 300 samples and the No Free Lunch average come out at exactly 0.5 taught me more than the proofs alone.</li>
+        <li><b>Check every claim against the output.</b> Several sentences I wrote before running the code turned out to be wrong; the data has the final say.</li>
+        <li><b>Real data is boring in useful ways.</b> No missing values, no outliers, independent features: those are findings, and they changed which methods were worth using.</li>
+        <li><b>Optimisers are simple; learning rates are not.</b> Four optimisers fit in 60 lines; choosing their learning rates fairly took a sweep.</li>
+        <li><b>Imbalance changes everything downstream.</b> 3.3% High fields is why balanced accuracy matters, and why my first Kaggle model stopped at 0.960 (fixed in the CSE274 project).</li>
+    </ul>
+    <h3>Possible extensions</h3>
+    <ul>
+        <li>A learning-rate schedule for the optimisers, to close the last gap to the true minimum.</li>
+        <li>Conformal prediction sets for all three classes, not just "not High".</li>
+        <li>The same theory experiments on real, noisier field data.</li>
+    </ul>
+</section>
+
+</body>
+</html>
