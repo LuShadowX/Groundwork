@@ -1,0 +1,29 @@
+[project]
+name = "groundwork"
+version = "1.0.0"
+description = "Foundations of machine learning, worked through on the Kaggle irrigation dataset"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "scipy>=1.13",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "scikit-learn>=1.5",
+    "statsmodels>=0.14",
+    "conviction[conformal] @ git+https://github.com/LuShadowX/conviction",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "jupyter", "nbconvert"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
